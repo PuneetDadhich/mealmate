@@ -2,6 +2,7 @@
 
 - **GitHub Repository**: [https://github.com/PuneetDadhich/mealmate](https://github.com/PuneetDadhich/mealmate)
 - **NPM Package (UI Library)**: [https://www.npmjs.com/package/mealmate-ui](https://www.npmjs.com/package/mealmate-ui)
+- **Live Deployed App**: [https://puneetdadhich.github.io/mealmate/](https://puneetdadhich.github.io/mealmate/)
 
 A modern Recipe Finder & Meal Planner platform built with Svelte 5, SvelteKit, and StencilJS web components.
 
@@ -19,6 +20,7 @@ This repository is organized as a monorepo containing two main projects:
 - **Favorites Management**: Save favorite recipes to local storage for quick access.
 - **Weekly Meal Planner**: Assign recipes to breakfast, lunch, or dinner for any day of the week.
 - **My Recipes (CRUD)**: Create, edit, and delete your own custom recipes with dynamic ingredient lists.
+- **Dark & Light Mode**: Premium, fully responsive theme toggle, seamlessly integrating with both the Svelte app and the Stencil UI components via CSS custom variables.
 - **Design System**: A complete custom design system with CSS custom properties, glassmorphism, and responsive layouts powered by StencilJS web components.
 
 ## Local Development

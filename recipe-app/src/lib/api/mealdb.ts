@@ -200,18 +200,18 @@ export async function filterByArea(area: string): Promise<MealDBFilterResult[]> 
 }
 
 export async function getCategories(): Promise<MealDBCategory[]> {
-	// Extract unique categories from both hardcoded and generated
-	const uniqueCats = new Set<string>();
-	INDIAN_VEG_RECIPES.forEach(r => uniqueCats.add(r.strCategory));
-	
+	// Extract unique areas to use as our "Categories" for the Homepage
+	const uniqueAreas = new Set<string>();
+	INDIAN_VEG_RECIPES.forEach(r => uniqueAreas.add(r.strArea));
+
 	let i = 1;
-	return Array.from(uniqueCats).map(cat => {
-		const firstRecipe = INDIAN_VEG_RECIPES.find(r => r.strCategory === cat);
+	return Array.from(uniqueAreas).map(area => {
+		const firstRecipe = INDIAN_VEG_RECIPES.find(r => r.strArea === area);
 		return {
 			idCategory: (i++).toString(),
-			strCategory: cat,
+			strCategory: area,
 			strCategoryThumb: firstRecipe ? firstRecipe.strMealThumb : '',
-			strCategoryDescription: `${cat} Cuisine`
+			strCategoryDescription: `${area} Cuisine`
 		};
 	});
 }

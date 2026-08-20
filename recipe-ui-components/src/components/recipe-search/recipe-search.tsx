@@ -8,16 +8,13 @@ import { Component, Prop, Event, EventEmitter, h, State } from '@stencil/core';
 export class RecipeSearch {
   @Prop() placeholder: string = 'Search recipes...';
   @Prop() value: string = '';
-  @Prop() categories: string = '[]';
   @Prop() areas: string = '[]';
-  @Prop() selectedCategory: string = '';
   @Prop() selectedArea: string = '';
 
   @State() internalValue: string = '';
   @State() isFocused: boolean = false;
 
   @Event() searchChanged: EventEmitter<string>;
-  @Event() categoryChanged: EventEmitter<string>;
   @Event() areaChanged: EventEmitter<string>;
   @Event() searchSubmitted: EventEmitter<string>;
 
@@ -49,11 +46,6 @@ export class RecipeSearch {
     this.searchChanged.emit('');
   }
 
-  private handleCategoryChange(e: Event) {
-    const val = (e.target as HTMLSelectElement).value;
-    this.categoryChanged.emit(val);
-  }
-
   private handleAreaChange(e: Event) {
     const val = (e.target as HTMLSelectElement).value;
     this.areaChanged.emit(val);
@@ -68,7 +60,6 @@ export class RecipeSearch {
   }
 
   render() {
-    const cats = this.parseJSON(this.categories);
     const areaList = this.parseJSON(this.areas);
 
     return (
@@ -96,26 +87,8 @@ export class RecipeSearch {
             </button>
           )}
         </div>
-        {(cats.length > 0 || areaList.length > 0) && (
+        {(areaList.length > 0) && (
           <div class="search__filters">
-            {cats.length > 0 && (
-              <div class="search__filter-group">
-                <select
-                  class="search__select"
-                  onChange={(e) => this.handleCategoryChange(e)}
-                >
-                  <option value="">All Categories</option>
-                  {cats.map((cat) => (
-                    <option value={cat} selected={cat === this.selectedCategory}>
-                      {cat}
-                    </option>
-                  ))}
-                </select>
-                <svg class="search__select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
-              </div>
-            )}
             {areaList.length > 0 && (
               <div class="search__filter-group">
                 <select

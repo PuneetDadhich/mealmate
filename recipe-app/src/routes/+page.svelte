@@ -103,7 +103,7 @@
 <section class="section">
 	<div class="container">
 		<div class="section-header">
-			<h2 class="section-title">Browse by Category</h2>
+			<h2 class="section-title">Browse by Cuisine</h2>
 			<a href="{base}/recipes" class="section-link">View All →</a>
 		</div>
 
@@ -117,7 +117,7 @@
 			<div class="categories-grid">
 				{#each categories as cat}
 					<a
-						href="{base}/recipes?category={encodeURIComponent(cat.strCategory)}"
+						href="{base}/recipes?area={encodeURIComponent(cat.strCategory)}"
 						class="category-card"
 					>
 						<img

@@ -21,15 +21,17 @@ const fetchJson = (url) => {
 const delay = (ms) => new Promise(res => setTimeout(res, ms));
 
 (async () => {
-  console.log('Fetching list of Vegetarian meals...');
-  const vegRes = await fetchJson('https://www.themealdb.com/api/json/v1/1/filter.php?c=Vegetarian');
-  
-  console.log('Fetching list of Vegan meals...');
-  const veganRes = await fetchJson('https://www.themealdb.com/api/json/v1/1/filter.php?c=Vegan');
-
+  console.log('Fetching all recipes from TheMealDB (A-Z)...');
   let allMeals = [];
-  if (vegRes && vegRes.meals) allMeals = allMeals.concat(vegRes.meals);
-  if (veganRes && veganRes.meals) allMeals = allMeals.concat(veganRes.meals);
+  const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
+
+  for (const letter of alphabet) {
+    const res = await fetchJson(`https://www.themealdb.com/api/json/v1/1/search.php?f=${letter}`);
+    if (res && res.meals) {
+      allMeals = allMeals.concat(res.meals);
+    }
+    await delay(100); // respect rate limits
+  }
 
   // Remove duplicates
   const uniqueMeals = [];
@@ -41,58 +43,58 @@ const delay = (ms) => new Promise(res => setTimeout(res, ms));
     }
   }
 
-  console.log(`Found ${uniqueMeals.length} unique meals. Fetching details...`);
+  console.log(`Found ${uniqueMeals.length} total unique meals in the entire database. Filtering for Vegetarian...`);
   
   const recipes = [];
-  // Process in batches of 5 to avoid overwhelming the API
-  for (let i = 0; i < uniqueMeals.length; i += 5) {
-    const batch = uniqueMeals.slice(i, i + 5);
-    const promises = batch.map(async (m) => {
-      const details = await fetchJson(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${m.idMeal}`);
-      if (details && details.meals && details.meals.length > 0) {
-        return details.meals[0];
+  
+  // Non-veg categories
+  const nonVegCategories = ['Beef', 'Chicken', 'Lamb', 'Pork', 'Seafood', 'Goat'];
+  
+  // Non-veg regex with word boundaries to prevent matching 'eggplant' with 'egg'
+  const nonVegRegex = /\b(eggs?|chicken|beef|pork|lamb|fish|meat|stock|broth|prawns?|shrimp|bacon|ham|salmon|tuna|cod|sausage|prosciutto|anchov(y|ies)|oyster|crab|lobster|veal|venison|duck|turkey|chorizo|pancetta|salami|pepperoni|gelatin|scallops?|mussels?|clams?|squid|calamari|haddock|tilapia|trout|mackerel)\b/i;
+
+  uniqueMeals.forEach(r => {
+    r.strTags = r.strTags || '';
+    r.strYoutube = r.strYoutube || '';
+    r.strSource = r.strSource || '';
+    r.strArea = (r.strArea && r.strArea !== 'Unknown') ? r.strArea : 'International';
+    
+    // Normalize typo from TheMealDB database
+    if (r.strArea === 'India') {
+      r.strArea = 'Indian';
+    }
+
+    let isNonVeg = false;
+    
+    // Check Category first
+    if (nonVegCategories.includes(r.strCategory)) {
+      isNonVeg = true;
+    }
+
+    // Check ingredients
+    if (!isNonVeg) {
+      for (let j = 1; j <= 20; j++) {
+        const ingredient = (r[`strIngredient${j}`] || '');
+        if (nonVegRegex.test(ingredient)) {
+          isNonVeg = true;
+          break;
+        }
       }
-      return null;
-    });
+    }
 
-    const results = await Promise.all(promises);
-    results.forEach(r => {
-      if (r) {
-        // Ensure properties exist to match MealDBRecipe interface
-        r.strTags = r.strTags || '';
-        r.strYoutube = r.strYoutube || '';
-        r.strSource = r.strSource || '';
-        // Handle missing cuisines
-        r.strArea = (r.strArea && r.strArea !== 'Unknown') ? r.strArea : 'Global';
+    // Check recipe title for sneaky meats
+    if (!isNonVeg && nonVegRegex.test(r.strMeal)) {
+      isNonVeg = true;
+    }
 
-        // Check for non-veg ingredients or eggs (strict vegetarian)
-        let isNonVeg = false;
-        const nonVegKeywords = ['egg', 'chicken', 'beef', 'pork', 'lamb', 'fish', 'meat', 'stock', 'broth', 'prawn', 'shrimp', 'bacon', 'ham'];
-        
-        for (let i = 1; i <= 20; i++) {
-          const ingredient = (r[`strIngredient${i}`] || '').toLowerCase();
-          if (nonVegKeywords.some(kw => ingredient.includes(kw))) {
-            isNonVeg = true;
-            break;
-          }
-        }
-
-        // Remove global recipes and any recipe containing non-veg items
-        if (r.strArea === 'Global' || isNonVeg) {
-          return; // Skip this recipe
-        }
-
-        // Since all recipes are vegetarian/vegan, make the Category equal to the Cuisine (Area)
-        if (r.strCategory === 'Vegetarian' || r.strCategory === 'Vegan') {
-            r.strCategory = r.strArea;
-        }
-        recipes.push(r);
+    if (!isNonVeg) {
+      // Re-categorize the generic "Vegetarian" and "Vegan" categories so they are more descriptive
+      if (r.strCategory === 'Vegetarian' || r.strCategory === 'Vegan') {
+          r.strCategory = 'Main Course';
       }
-    });
-
-    console.log(`Fetched details for ${recipes.length}/${uniqueMeals.length} recipes...`);
-    await delay(100);
-  }
+      recipes.push(r);
+    }
+  });
 
   const dir = path.join(__dirname, '../recipe-app/src/lib/data');
   if (!fs.existsSync(dir)){
@@ -100,5 +102,5 @@ const delay = (ms) => new Promise(res => setTimeout(res, ms));
   }
 
   fs.writeFileSync(path.join(dir, 'recipes.json'), JSON.stringify(recipes, null, 2));
-  console.log('Successfully imported real recipes with exact images from TheMealDB.');
+  console.log(`Successfully generated ${recipes.length} STRICTLY vegetarian recipes from the entire database!`);
 })();

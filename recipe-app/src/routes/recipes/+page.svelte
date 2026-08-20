@@ -7,7 +7,6 @@
 		searchRecipes,
 		filterByCategory,
 		filterByArea,
-		getCategoryNames,
 		getAreaNames,
 		getRecipeById,
 		listByFirstLetter,
@@ -17,27 +16,23 @@
 	import { isFavorite, toggleFavorite } from '$lib/stores/favorites.svelte';
 
 	let recipes = $state<MealDBRecipe[]>([]);
-	let categories = $state<string[]>([]);
 	let areas = $state<string[]>([]);
 	let loading = $state(true);
-	let selectedCategory = $state('');
 	let selectedArea = $state('');
 	let searchQuery = $state('');
 
 	onMount(async () => {
-		const [cats, areaList] = await Promise.all([getCategoryNames(), getAreaNames()]);
-		categories = cats;
-		areas = areaList;
+		areas = await getAreaNames();
 
 		const urlQ = page.url.searchParams.get('q');
-		const urlCat = page.url.searchParams.get('category');
+		const urlCat = page.url.searchParams.get('area');
 
 		if (urlQ) {
 			searchQuery = urlQ;
 			await doSearch(urlQ);
 		} else if (urlCat) {
-			selectedCategory = urlCat;
-			await doFilterCategory(urlCat);
+			selectedArea = urlCat;
+			await doFilterArea(urlCat);
 		} else {
 			await loadDefault();
 		}
@@ -66,23 +61,6 @@
 			loading = false;
 		}
 	}
-
-	async function doFilterCategory(category: string) {
-		loading = true;
-		try {
-			const filtered: MealDBFilterResult[] = await filterByCategory(category);
-			const detailed = await Promise.all(
-				filtered.slice(0, 20).map((r) => getRecipeById(r.idMeal))
-			);
-			recipes = detailed.filter((r): r is MealDBRecipe => r !== null);
-		} catch (err) {
-			console.error('Filter failed:', err);
-			recipes = [];
-		} finally {
-			loading = false;
-		}
-	}
-
 	async function doFilterArea(area: string) {
 		loading = true;
 		try {
@@ -103,22 +81,9 @@
 		const query = e.detail;
 		searchQuery = query;
 		if (query.trim()) {
-			selectedCategory = '';
 			selectedArea = '';
 			doSearch(query);
-		} else if (!selectedCategory && !selectedArea) {
-			loadDefault();
-		}
-	}
-
-	function handleCategoryChanged(e: CustomEvent) {
-		const cat = e.detail;
-		selectedCategory = cat;
-		selectedArea = '';
-		searchQuery = '';
-		if (cat) {
-			doFilterCategory(cat);
-		} else {
+		} else if (!selectedArea) {
 			loadDefault();
 		}
 	}
@@ -126,7 +91,6 @@
 	function handleAreaChanged(e: CustomEvent) {
 		const area = e.detail;
 		selectedArea = area;
-		selectedCategory = '';
 		searchQuery = '';
 		if (area) {
 			doFilterArea(area);
@@ -152,12 +116,9 @@
 			<recipe-search
 				placeholder="Search recipes by name..."
 				value={searchQuery}
-				categories={JSON.stringify(categories)}
 				areas={JSON.stringify(areas)}
-				selected-category={selectedCategory}
 				selected-area={selectedArea}
 				onsearchChanged={handleSearchChanged}
-				oncategoryChanged={handleCategoryChanged}
 				onareaChanged={handleAreaChanged}
 			></recipe-search>
 		</div>
