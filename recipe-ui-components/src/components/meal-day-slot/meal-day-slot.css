@@ -1,0 +1,154 @@
+:host {
+  --slot-bg: var(--mealmate-card-bg, #1e1e2e);
+  --slot-border: var(--mealmate-card-border, rgba(255, 255, 255, 0.06));
+  --slot-radius: var(--mealmate-card-radius, 12px);
+  --text-primary: var(--mealmate-text-primary, #f0f0f5);
+  --text-secondary: var(--mealmate-text-secondary, #a0a0b8);
+  --accent: var(--mealmate-accent, #f59e0b);
+
+  display: block;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.slot {
+  background: var(--slot-bg);
+  border: 1.5px dashed var(--slot-border);
+  border-radius: var(--slot-radius);
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.slot--empty:hover {
+  border-color: var(--accent);
+  background: rgba(245, 158, 11, 0.04);
+}
+
+.slot--filled {
+  border-style: solid;
+  border-color: rgba(245, 158, 11, 0.15);
+  background: linear-gradient(135deg, var(--slot-bg), rgba(245, 158, 11, 0.03));
+}
+
+.slot__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.slot__meal-icon {
+  font-size: 0.85rem;
+}
+
+.slot__meal-type {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+}
+
+.slot__empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 4px;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.slot--empty:hover .slot__empty-state {
+  opacity: 0.8;
+}
+
+.slot__add-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px dashed var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.slot--empty:hover .slot__add-icon {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.slot__add-icon svg {
+  width: 14px;
+  height: 14px;
+  color: var(--text-secondary);
+}
+
+.slot--empty:hover .slot__add-icon svg {
+  color: var(--accent);
+}
+
+.slot__empty-text {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.slot__filled-state {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.slot__recipe-image {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.slot__recipe-name {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slot__remove {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.slot__remove svg {
+  width: 12px;
+  height: 12px;
+}
+
+.slot:hover .slot__remove {
+  opacity: 1;
+}
+
+.slot__remove:hover {
+  background: rgba(239, 68, 68, 0.3);
+}

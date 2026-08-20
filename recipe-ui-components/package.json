@@ -1,0 +1,48 @@
+{
+  "name": "mealmate-ui",
+  "version": "1.0.3",
+  "description": "A reusable StencilJS web component library for recipe and meal planning applications",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "collection": "dist/collection/collection-manifest.json",
+  "collection:main": "dist/collection/index.js",
+  "unpkg": "dist/mealmate-ui/mealmate-ui.esm.js",
+  "exports": {
+    ".": {
+      "import": "./dist/mealmate-ui/mealmate-ui.esm.js",
+      "require": "./dist/mealmate-ui/mealmate-ui.cjs.js"
+    },
+    "./loader": {
+      "import": "./loader/index.js",
+      "require": "./loader/index.cjs",
+      "types": "./loader/index.d.ts"
+    },
+    "./dist/*": "./dist/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PuneetDadhich/mealmate.git"
+  },
+  "keywords": [
+    "stencil",
+    "web-components",
+    "recipe",
+    "meal-planner",
+    "ui-components"
+  ],
+  "author": "Puneet Dadhich",
+  "files": [
+    "dist/",
+    "loader/"
+  ],
+  "scripts": {
+    "build": "stencil build",
+    "start": "stencil build --dev --watch --serve",
+    "generate": "stencil generate"
+  },
+  "devDependencies": {
+    "@stencil/core": "^4.27.1 || ^5.0.0-0"
+  },
+  "license": "MIT"
+}
